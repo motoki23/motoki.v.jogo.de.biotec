@@ -1,0 +1,520 @@
+<DOCTYPE html>
+<html lang="pt-BR">
+<head><!
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Primitivuus – Crie a Vida</title>
+<style>
+/* 🔥 Reset e estilo global */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+body {
+  background: url(lava-background-2cjfogit5htu6gbi.jpg) center/cover fixed no-repeat;
+  color: #330000;
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+}
+
+/* 🪶 Camadas transparentes com transição inicial */
+section, footer {
+  background: rgba(255,255,255,0.85);
+  backdrop-filter: blur(6px);
+  margin: 30px auto;
+  padding: 30px 20px;
+  border-radius: 12px;
+  max-width: 1000px;
+  box-shadow: 0 0 20px rgba(255, 80, 0, 0.3);
+  opacity: 0;
+  transition: opacity 1s ease, transform 1s ease;
+}
+
+/* ✨ Tipos de entrada */
+.fade-up   { transform: translateY(50px); }
+.fade-left { transform: translateX(-80px); }
+.fade-right{ transform: translateX(80px); }
+.fade-zoom { transform: scale(0.85); }
+.fade-diag { transform: translate(-60px, 60px); }
+
+.visible {
+  opacity: 1;
+  transform: translate(0,0) scale(1);
+}
+
+/* 🔺 Cabeçalho preto fixo */
+header {
+  text-align: center;
+  background: rgba(0,0,0,0.85); 
+  color: #fff;
+  border-bottom: 2px solid #ff4500;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  padding: 15px 10px;
+}
+
+/* ☰ Botão menu lateral (esquerda) */
+.menu-toggle {
+  position: fixed;
+  top: 15px;
+  left: 15px;
+  z-index: 200;
+  background: #ff4500;
+  color: #fff;
+  border: none;
+  padding: 10px 15px;
+  font-size: 1.2rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+.menu-toggle:hover {
+  transform: scale(1.1);
+}
+
+/* 🧭 Menu lateral */
+#main-nav {
+  position: fixed;
+  top: 0;
+  left: -250px;
+  height: 100%;
+  width: 250px;
+  background: rgba(0,0,0,0.95);
+  display: flex;
+  flex-direction: column;
+  padding-top: 60px;
+  transition: left 0.4s ease;
+  z-index: 150;
+}
+#main-nav.show {
+  left: 0;
+}
+
+#main-nav button {
+  background: linear-gradient(180deg, #ff3b00, #7a1800);
+  border: none;
+  padding: 15px 20px;
+  margin: 10px;
+  color: #fff;
+  font-size: 1.1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: left;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+#main-nav button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 15px #ff5a00;
+}
+
+/* 🔥 Títulos e textos */
+section h2 {
+  color: #b22222;
+  font-size: 1.8rem;
+  margin-bottom: 15px;
+  border-bottom: 2px solid #ff6a00;
+  padding-bottom: 6px;
+}
+section p, li {
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+
+/* 🧩 Tabelas */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  box-shadow: 0 0 10px rgba(0,0,0,0.2);
+}
+th, td {
+  border: 1px solid #b22222;
+  padding: 10px;
+  text-align: center;
+}
+th {
+  background: linear-gradient(180deg, #ff4500, #b22222);
+  color: #fff;
+}
+td {
+  background: rgba(255,255,255,0.9);
+}
+
+/* 📜 Imagem das cartas */
+.card-image {
+  width: 220px;
+  height: 320px;
+  background: rgba(255,255,255,0.6);
+  border: 2px solid #ff4500;
+  border-radius: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 25px auto;
+  color: #661a00;
+  font-weight: bold;
+  box-shadow: 0 0 15px rgba(255,100,0,0.4);
+}
+
+/* 🛒 Botão loja */
+.buy-button {
+  display: block;
+  width: 230px;
+  text-align: center;
+  margin: 30px auto;
+  padding: 15px;
+  background: linear-gradient(180deg, #ff0000, #7a0000);
+  color: #fff;
+  font-size: 1.2rem;
+  text-decoration: none;
+  border-radius: 8px;
+  box-shadow: 0 0 20px rgba(255, 50, 0, 0.6);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.buy-button:hover {
+  transform: scale(1.08);
+  box-shadow: 0 0 25px #ff8c00;
+}
+
+/* 📩 Formulário */
+form input, form textarea {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #b22222;
+  border-radius: 5px;
+}
+form button {
+  background: linear-gradient(180deg, #ff3b00, #7a1800);
+  border: none;
+  padding: 10px 20px;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+}
+form button:hover {
+  box-shadow: 0 0 10px #ff8c00;
+}
+
+/* ⚙️ Rodapé */
+footer {
+  background: rgba(0,0,0,0.7);
+  color: #fff;
+  text-align: center;
+  font-size: 0.9rem;
+  border-radius: 12px;
+  padding: 20px;
+}
+
+/* 📱 Responsividade */
+@media(max-width: 768px) {
+  .card-image { width: 160px; height: 240px; }
+  #main-nav { width: 200px; }
+}
+
+/* 💥 Efeito de tremor */
+@keyframes shake {
+  0%, 100% { transform: translate(0, 0); }
+  10% { transform: translate(-2px, 2px); }
+  20% { transform: translate(2px, -2px); }
+  30% { transform: translate(-2px, 2px); }
+  40% { transform: translate(2px, -2px); }
+  50% { transform: translate(-2px, 2px); }
+  60% { transform: translate(2px, -2px); }
+  70% { transform: translate(-2px, 2px); }
+  80% { transform: translate(2px, -2px); }
+  90% { transform: translate(-2px, 2px); }
+}
+.shake {
+  animation: shake 0.5s;
+}
+
+/* 🌋 Partículas de cinzas incandescentes */
+.particle {
+  position: fixed;
+  width: 5px;
+  height: 5px;
+  background: radial-gradient(circle, rgba(255,150,0,1) 0%, rgba(255,70,0,0.6) 70%, rgba(255,40,0,0) 100%);
+  border-radius: 50%;
+  top: -10px;
+  pointer-events: none;
+  animation: fall linear forwards;
+  box-shadow: 0 0 10px rgba(255,80,0,0.8);
+}
+@keyframes fall {
+  0% { transform: translateY(0) translateX(0) scale(1); opacity: 1; }
+  100% { transform: translateY(100vh) translateX(30px) scale(0.5); opacity: 0; }
+}
+/* ✨ Efeito de brilho pulsante no título */
+header h1 {
+  font-size: 2.5rem;
+  color: #ff4500;
+  text-shadow:
+    0 0 10px #ff3b00,
+    0 0 20px #ff6a00,
+    0 0 30px #ff4500,
+    0 0 40px #ff2200;
+  animation: glowPulse 3s ease-in-out infinite;
+}
+
+/* 🔄 Animação de brilho fade in/fade out */
+@keyframes glowPulse {
+  0%, 100% {
+    opacity: 0.8;
+    text-shadow:
+      0 0 5px #ff3b00,
+      0 0 15px #ff6a00,
+      0 0 25px #ff4500;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    text-shadow:
+      0 0 25px #ff8c00,
+      0 0 40px #ff4500,
+      0 0 60px #ff2200;
+    transform: scale(1.05);
+  }
+}
+/* 🃏 Carrossel de cartas */
+.card-carousel {
+  position: relative;
+  width: 220px;
+  height: 320px;
+  margin: 25px auto;
+  border: 2px solid #ff4500;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 0 15px rgba(255,100,0,0.4);
+  background: rgba(255,255,255,0.6);
+}
+
+.card-slide {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 1s ease-in-out;
+}
+
+.card-slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+.card-slide.active {
+  opacity: 1;
+}
+/* 🌋 Duas imagens horizontais menores lado a lado */
+.game-images-horizontal {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px; /* espaçamento entre as imagens */
+  flex-wrap: wrap;
+  margin: 20px auto;
+}
+
+.horizontal-card {
+  width: 220px;   /* largura menor */
+  height: 140px;  /* altura proporcional */
+  border: 2px solid #ff4500;
+  border-radius: 10px;
+  overflow: hidden;
+  background: rgba(255,255,255,0.7);
+  box-shadow: 0 0 10px rgba(255,100,0,0.4);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.horizontal-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+.horizontal-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 20px rgba(255,80,0,0.8);
+}
+
+/* 📱 Responsivo para celular */
+@media(max-width: 700px) {
+  .horizontal-card {
+    width: 80%;
+    height: auto;
+  }
+}
+
+
+</style>
+</head>
+<body>
+
+<header><h1>🔥 PRIMITIVUUS 🔥</h1></header>
+
+<button class="menu-toggle" onclick="toggleMenu()">☰ Menu</button>
+
+<nav id="main-nav">
+  <button onclick="scrollToSection('home')">Início</button>
+  <button onclick="scrollToSection('sobre')">Sobre</button>
+  <button onclick="scrollToSection('como-jogar')">Como Jogar</button>
+  <button onclick="scrollToSection('loja')">Loja</button>
+  <button onclick="scrollToSection('dicas')">Dicas</button>
+  <button onclick="scrollToSection('contato')">Contato</button>
+</nav>
+
+<section id="home" class="fade-up">
+  <h2>Bem-vindo a Primitivuus!</h2>
+  <p>Entre na Terra primitiva e seja o primeiro a criar vida combinando os elementos da natureza. Posicione triângulos, desbloqueie cartas e evolua até formar a primeira bactéria</p>
+<div class="game-images-horizontal">
+  <div class="horizontal-card">
+    <img src="ChatGPT Image 31 de out. de 2025, 21_23_27.png" alt="Imagem horizontal 1">
+  </div>
+  <div class="horizontal-card">
+    <img src="ChatGPT Image 31 de out. de 2025, 21_23_34.png" alt="Imagem horizontal 2">
+  </div>
+</div>
+
+
+</section>
+
+<section id="sobre" class="fade-left">
+  <h2>Sobre o Jogo</h2>
+  <p>Primitivuus é um jogo de estratégia em que você manipula os elementos 🔥🌊🌍💨⚡ para evoluir e criar vida. Cada carta desbloqueada te aproxima do objetivo final: a carta Bactéria.</p>
+</section>
+
+<section id="como-jogar" class="fade-right">
+  <h2>Como Jogar</h2>
+  <p>Durante seu turno, você posiciona 3 peças triangulares no tabuleiro. O tipo de triângulo formado determina quantos elementos você ganha.</p>
+  <table>
+    <<tr><th>Tipo de Triângulo</th><th>Características</th><th>Recompensa</th></tr>
+    <tr><td>Escaleno 🔺</td><td>3 lados diferentes</td><td>+1 elemento à escolha</td></tr>
+    <tr><td>Isósceles 🔻</td><td>2 lados iguais</td><td>+2 elementos</td></tr>
+    <tr><td>Equilátero 🔺</td><td>3 lados iguais</td><td>+3 elementos</td></tr>
+    <tr><td>Linha / encostes ➖</td><td>Não forma triângulo válido</td><td>+0 elementos</td></tr>
+  </table>
+  <h3>Cartas</h3>
+  <p>Existem cartas de Fase (comuns) e cartas Coringa (especiais).</p>
+  <table>
+    <tr><th>Tipo</th><th>Exemplo</th><th>Efeito</th></tr>
+    <tr><td>Fase</td><td>Calor Vulcânico + Chuva Ácida</td><td>Consome 🔥 + 🌊 + 🌍</td></tr>
+    <tr><td>Coringa</td><td>Meteoro</td><td>Destrói carta bloqueada e recupera elementos</td></tr>
+    <tr><td>Coringa</td><td>Tornado</td><td>Oponente descarta carta da mão</td></tr>
+  </table>
+    <div class="card-carousel">
+  <div class="card-slide fade">
+    <img src="WhatsApp Image 2025-10-31 at 20.13.33 (1).jpeg" alt="Carta 1">
+  </div>
+  <div class="card-slide fade">
+    <img src="WhatsApp Image 2025-10-31 at 20.13.33 (2).jpeg" alt="Carta 2">
+  </div>
+  <div class="card-slide fade">
+    <img src="WhatsApp Image 2025-10-31 at 20.13.33.jpeg" alt="Carta 3">
+  </div>
+  <div class="card-slide fade">
+    <img src="WhatsApp Image 2025-10-31 at 20.13.34.jpeg" alt="Carta 4">
+  </div>
+</div>
+
+
+</section>
+
+<section id="loja" class="fade-zoom">
+  <h2>Loja</h2>
+  <p>Adquira seu exemplar e comece a criar vida!</p>
+  <a href="#" class="buy-button">Comprar Agora</a>
+</section>
+
+<section id="dicas" class="fade-diag">
+  <h2>Dicas de Estratégia</h2>
+  <ul>
+    <li>Priorize triângulos equiláteros para ganhar mais elementos.</li>
+    <li>Guarde energia ⚡ para usar cartas Coringa.</li>
+    <li>Use o Meteoro para se livrar de cartas bloqueadas inúteis.</li>
+    <li>Evite ter 5 cartas bloqueadas ao mesmo tempo.</li>
+    <li>Planeje combinações de Fase para evoluir rapidamente.</li>
+  </ul>
+</section>
+
+<section id="contato" class="fade-up">
+  <h2>Contato</h2>
+  <p>Envie suas dúvidas abaixo:</p>
+  <form>
+    <input type="text" placeholder="Seu nome" required>
+    <input type="email" placeholder="Seu email" required>
+    <textarea placeholder="Mensagem" rows="4" required></textarea>
+    <button type="submit">Enviar</button>
+  </form>
+</section>
+
+<footer class="fade-zoom">
+  <p>© 2025 PRIMITIVUUS – Todos os direitos reservados</p>
+</footer>
+
+<script>
+function toggleMenu() {
+  document.getElementById('main-nav').classList.toggle('show');
+}
+
+function scrollToSection(id) {
+  document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+  toggleMenu();
+}
+
+// 💥 Tremor aleatório
+function randomShake() {
+  document.body.classList.add('shake');
+  setTimeout(() => document.body.classList.remove('shake'), 500);
+  setTimeout(randomShake, 5000 + Math.random() * 10000);
+}
+randomShake();
+
+// 🌋 Cinzas incandescentes
+function createParticle() {
+  const particle = document.createElement('div');
+  particle.classList.add('particle');
+  particle.style.left = Math.random() * window.innerWidth + 'px';
+  particle.style.animationDuration = 3 + Math.random() * 3 + 's';
+  document.body.appendChild(particle);
+  particle.addEventListener('animationend', () => particle.remove());
+}
+setInterval(createParticle, 180);
+
+// 👁️‍🗨️ Efeitos de entrada por scroll
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      observer.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.2 });
+
+document.querySelectorAll('section, footer').forEach(el => observer.observe(el));
+// 🃏 Carrossel automático de cartas
+let currentCard = 0;
+const slides = document.querySelectorAll('.card-slide');
+
+function showNextCard() {
+  slides[currentCard].classList.remove('active');
+  currentCard = (currentCard + 1) % slides.length;
+  slides[currentCard].classList.add('active');
+}
+
+if (slides.length > 0) {
+  slides[0].classList.add('active');
+  setInterval(showNextCard, 3000); // troca a cada 3 segundos
+}
+
+</script>
+
+
+</body>
+</html>
