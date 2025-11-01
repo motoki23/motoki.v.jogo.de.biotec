@@ -351,6 +351,90 @@ header h1 {
     height: auto;
   }
 }
+/* 🛒 Botão de compra centralizado */
+.buy-btn {
+  background-color: #ff4500;
+  color: white;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 10px;
+  font-size: 18px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  display: block;           /* faz ele se comportar como um bloco */
+  margin: 30px auto;        /* centraliza horizontalmente */
+  text-align: center;
+}
+.buy-btn:hover {
+  background-color: #ff6347;
+}
+
+/* 💰 Modal (fundo escuro em primeiro plano) */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 9999; /* 🔝 garante que fica acima de tudo */
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.7);
+  justify-content: center;
+  align-items: center;
+}
+
+/* 🦴 Caixa da janela */
+.modal-content {
+  background: #fffaf0;
+  border: 2px solid #ff4500;
+  border-radius: 15px;
+  padding: 25px;
+  width: 320px;
+  text-align: center;
+  box-shadow: 0 0 30px rgba(255,120,0,0.6);
+  z-index: 10000; /* ainda mais alto dentro do modal */
+}
+
+.modal-content input {
+  width: 90%;
+  padding: 8px;
+  margin: 10px 0;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 15px;
+}
+
+/* Botões dentro do modal */
+.confirm-btn, .cancel-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.confirm-btn {
+  background-color: #32cd32;
+  color: white;
+}
+
+.cancel-btn {
+  background-color: #ff4500;
+  color: white;
+}
+
+.confirm-btn:hover {
+  background-color: #28a428;
+}
+
+.cancel-btn:hover {
+  background-color: #e03e00;
+}
 
 
 </style>
@@ -429,7 +513,26 @@ header h1 {
 <section id="loja" class="fade-zoom">
   <h2>Loja</h2>
   <p>Adquira seu exemplar e comece a criar vida!</p>
-  <a href="#" class="buy-button">Comprar Agora</a>
+ <!-- 🔘 Botão de compra -->
+<button id="buyButton" class="buy-btn">🛒 Comprar</button>
+
+<!-- 💰 Janela de compra (modal) -->
+<div id="buyModal" class="modal">
+  <div class="modal-content">
+    <h2>🦴 Compra de PRIMITIVUUS</h2>
+    <p><strong>Valor:</strong> R$ 79,90</p>
+    <p><strong>Chave Pix:</strong> primitivuus@jogo.com</p>
+
+    <label for="endereco"><strong>Endereço para envio:</strong></label>
+    <input type="text" id="endereco" placeholder="Digite seu endereço completo">
+
+    <div class="modal-buttons">
+      <button id="confirmarCompra" class="confirm-btn">✅ Confirmar</button>
+      <button id="cancelarCompra" class="cancel-btn">❌ Cancelar</button>
+    </div>
+  </div>
+</div>
+
 </section>
 
 <section id="dicas" class="fade-diag">
@@ -514,8 +617,40 @@ if (slides.length > 0) {
 }
 
 </script>
+<script>
+  const buyButton = document.getElementById('buyButton');
+  const buyModal = document.getElementById('buyModal');
+  const cancelarCompra = document.getElementById('cancelarCompra');
+  const confirmarCompra = document.getElementById('confirmarCompra');
+
+  buyButton.addEventListener('click', () => {
+    buyModal.style.display = 'flex';
+  });
+
+  cancelarCompra.addEventListener('click', () => {
+    buyModal.style.display = 'none';
+  });
+
+  confirmarCompra.addEventListener('click', () => {
+    const endereco = document.getElementById('endereco').value;
+    if (endereco.trim() === '') {
+      alert('Por favor, digite seu endereço antes de confirmar.');
+    } else {
+      alert('✅ Compra confirmada! Seu jogo será enviado para: ' + endereco);
+      buyModal.style.display = 'none';
+    }
+  });
+
+  // Fecha o modal se clicar fora da caixa
+  window.addEventListener('click', (e) => {
+    if (e.target === buyModal) {
+      buyModal.style.display = 'none';
+    }
+  });
+</script>
 
 
 </body>
 </html>
+
 
